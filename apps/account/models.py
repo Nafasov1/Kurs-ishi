@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from random import randint
+
+from django.db.models.signals import pre_save
 
 
 class UserManager(BaseUserManager):
@@ -36,3 +39,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()
+
+
+class Token(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.token)
+
+
+def user_token_pre_save(sender, instance, *args, **kwargs):
+    if not instance.token:
+        instance.token = randint(100000, 999999)
+
+pre_save.connect(user_token_pre_save, sender=Token)

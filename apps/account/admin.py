@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import User, Token
 from .forms import UserCreationForm, UserChangeForm
 
 
@@ -31,3 +31,10 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ('groups', 'user_permissions')
     list_editable = ('is_active', 'is_staff', 'is_superuser')
     ordering = ()
+
+@admin.register(Token)
+class TokenAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'token', 'created_date')
+    date_hierarchy = 'created_date'
+    ordering = ('-id',)
+    write_only_fields = ('token',)
